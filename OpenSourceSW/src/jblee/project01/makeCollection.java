@@ -16,17 +16,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class XmlParsing {
-	public static void main (String[] args) {
+public class makeCollection {
+	public void xmlParsing(String dirPath) {
+//	public static void main (String[] args) {
 		
 		try
 		{
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-		
 			Document doc = docBuilder.newDocument();
 			
-			String path = "C:/SimpleIR/OpenSourceSW/html";
+//			String path = "C:/SimpleIR/OpenSourceSW/html";
+			String path = dirPath;
 			File dir = new File(path);
 			File[] htmllist = dir.listFiles();
 			int id = 0;
@@ -76,7 +77,7 @@ public class XmlParsing {
 			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 			
 			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new FileOutputStream(new File("src/data/collection.xml")));
+			StreamResult result = new StreamResult(new FileOutputStream(new File("C:/SimpleIR/OpenSourceSW/src/data/collection.xml")));
 			
 			transformer.transform(source, result);
 		}catch (Exception e) {
