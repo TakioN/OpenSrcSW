@@ -59,9 +59,4 @@ public class makeKeyword {
 		}
 		
 	}
-
-//	public void kkma(String path) {
-//		// TODO Auto-generated method stub
-//		
-//	}	
 }
