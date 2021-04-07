@@ -51,7 +51,7 @@ public class indexer {
 			}
 			for(int i = 0; i < token.length; i++) {
 				for(int j = 0; j < token[i].length; j += 2) {
-					double w = Integer.parseInt(token[i][j + 1]) * (Math.log10((double)docsCount / (int)eachDF.get(token[i][j])));
+					double w = Integer.parseInt(token[i][j + 1]) * (Math.log((double)docsCount / (int)eachDF.get(token[i][j])));
 					if(!(keywordMap.containsKey(token[i][j]))) {
 						ArrayList tfidf = new ArrayList();
 						for(int k = 0; k < docsCount; k++) {
