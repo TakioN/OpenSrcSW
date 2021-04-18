@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 
 public class searcher {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void Calcsim(String filePath, String query) throws IOException, ClassNotFoundException, ParserConfigurationException, SAXException {
+	public void Calcsim2(String filePath, String query) throws IOException, ClassNotFoundException, ParserConfigurationException, SAXException {
 		Scanner scan = new Scanner(System.in);
 		
 		String q = query;
@@ -57,10 +57,6 @@ public class searcher {
 		double[] cosQid = new double[titles.getLength()];
 		double kkmaWeight = 0.0; 
 		double hashWeight = 0.0; 
-		
-		for(int i = 0; i < titles.getLength(); i++) {
-			
-		}
 		
 		for(int i = 0; i < qid.length; i++) {
 			qid[i] = 0.0;
@@ -102,6 +98,7 @@ public class searcher {
 			if(flag == 3) break;
 		}
 		
+
 		System.out.println("Title Top 3");
 		
 		for(int i = 0; i < top.length; i++) {
@@ -113,5 +110,4 @@ public class searcher {
 		
 		scan.close();
 	}
-
 }

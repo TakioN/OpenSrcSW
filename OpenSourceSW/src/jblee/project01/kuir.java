@@ -26,7 +26,8 @@ public class kuir {
 		}
 		else if(command.equals("-s")) {
 			searcher s = new searcher();
-			s.Calcsim(path, args[3]);
+			s.Calcsim2(path, args[3]);
+
 		}
 	}
 
