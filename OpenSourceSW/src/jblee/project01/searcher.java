@@ -25,10 +25,10 @@ import org.xml.sax.SAXException;
 public class searcher {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void Calcsim(String filePath, String query) throws IOException, ClassNotFoundException, ParserConfigurationException, SAXException {
-
-		Scanner scan = new Scanner(System.in);
+	public void Calcsim(String filePath, String query) 
+			throws IOException, ClassNotFoundException, ParserConfigurationException, SAXException {
 		
+		Scanner scan = new Scanner(System.in);
 		String q = query;
 		KeywordExtractor ke = new KeywordExtractor();
 		KeywordList kl = ke.extractKeyword(q, true);
@@ -56,11 +56,13 @@ public class searcher {
 		
 		double[] qid = new double[titles.getLength()];
 		double[] cosQid = new double[titles.getLength()];
-		double kkmaWeight = 0.0; 
-		double hashWeight = 0.0; 
+		double[] kkmaWeight = new double[titles.getLength()]; 
+		double[] hashWeight = new double[titles.getLength()]; 
+		
 		
 		for(int i = 0; i < qid.length; i++) {
-			qid[i] = 0.0;
+			kkmaWeight[i] = 0.0;
+			hashWeight[i] = 0.0;
 			Iterator<String> it = kkmaHash.keySet().iterator();
 			while(it.hasNext()) {
 				String key = it.next();
@@ -68,18 +70,20 @@ public class searcher {
 				if(hashMap.containsKey(key)) {
 					ArrayList value = (ArrayList)hashMap.get(key);
 					double indexWeight = ((Number)(value.get(2 * i + 1))).doubleValue(); //index.post의 weight
-					hashWeight += (indexWeight * indexWeight);
-					kkmaWeight += (queryWeight * queryWeight);
-					qid[i] += queryWeight * indexWeight;
+					hashWeight[i] += (indexWeight * indexWeight);
+					kkmaWeight[i] += (queryWeight * queryWeight);
 				}			
 			}
 		}
-		
+
+		for(int i = 0; i < qid.length; i++) 
+			qid[i] = InnerProduct(kkmaHash, hashMap, i);
+			
 		for(int i = 0; i < cosQid.length; i++) {
 			if(qid[i] == 0)
 				cosQid[i] = 0;
 			else 
-				cosQid[i] = qid[i] / (Math.sqrt(kkmaWeight) * Math.sqrt(hashWeight));
+				cosQid[i] = qid[i] / (Math.sqrt(kkmaWeight[i]) * Math.sqrt(hashWeight[i]));
 			System.out.println("Sim(Q,id(" + i + ")) = " + String.format("%.2f", cosQid[i]));
 		}	
 		
@@ -108,85 +112,26 @@ public class searcher {
 			String str = e.getTextContent();
 			System.out.println(str);
 		}
-		
 		scan.close();
 	}
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void InnerProduct(String filePath, String query) throws IOException, ClassNotFoundException, ParserConfigurationException, SAXException {
-		Scanner scan = new Scanner(System.in);
+	public double InnerProduct(HashMap kkma, HashMap hash, int idx) 
+			throws IOException, ClassNotFoundException, ParserConfigurationException, SAXException {
 		
-		String q = query;
-		KeywordExtractor ke = new KeywordExtractor();
-		KeywordList kl = ke.extractKeyword(q, true);
-		HashMap kkmaHash = new HashMap();
-		for(int i = 0; i < kl.size(); i++) {
-			Keyword kwrd = kl.get(i);
-			kkmaHash.put(kwrd.getString(), 1);
+		double qid = 0.0;
+		Iterator<String> it = kkma.keySet().iterator();
+		while(it.hasNext()) {
+			String key = it.next();
+			double queryWeight = ((Number)(kkma.get(key))).doubleValue();   //입력한 쿼리의 단어 weight
+			if(hash.containsKey(key)) {
+				ArrayList value = (ArrayList)hash.get(key);
+				double indexWeight = ((Number)(value.get(2 * idx + 1))).doubleValue(); //index.post의 weight
+				qid += queryWeight * indexWeight;
+			}			
 		}
 		
-		String path = filePath;
-		FileInputStream fileStream = new FileInputStream(path);
-		ObjectInputStream objectInputStream = new ObjectInputStream(fileStream);
-		
-		Object object = objectInputStream.readObject();
-		objectInputStream.close();
-		
-		HashMap hashMap = (HashMap)object;
-		
-		String url = "file:///C:/SimpleIR/OpenSourceSW/src/data/collection.xml";
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-		Document doc = docBuilder.parse(url);
-		
-		NodeList titles = doc.getElementsByTagName("title");
-		
-		double[] qid = new double[titles.getLength()]; 
-		
-		for(int i = 0; i < qid.length; i++) {
-			qid[i] = 0.0;
-			Iterator<String> it = kkmaHash.keySet().iterator();
-			while(it.hasNext()) {
-				String key = it.next();
-				double queryWeight = ((Number)(kkmaHash.get(key))).doubleValue();   //입력한 쿼리의 단어 weight
-				if(hashMap.containsKey(key)) {
-					ArrayList value = (ArrayList)hashMap.get(key);
-					double indexWeight = ((Number)(value.get(2 * i + 1))).doubleValue(); //index.post의 weight
-					qid[i] += queryWeight * indexWeight;
-				}			
-			}
-		}
-		
-		for(int i = 0; i < qid.length; i++) {
-			System.out.println("Q.id(" + i + ") = " + String.format("%.2f", qid[i]));
-		}	
-		
-		double[] sortedQid = qid.clone();
-		Arrays.sort(sortedQid);
-		
-		int[] top = new int[3];	
-		int flag = 0;
-		for(int i = sortedQid.length - 1; i > sortedQid.length - 4; i--) {
-			for(int j = 0; j < qid.length; j++) {
-				if(sortedQid[i] == qid[j]) {
-					top[flag] = j;
-					flag++;
-				}
-				if(flag == 3) break;
-			}
-			if(flag == 3) break;
-		}
-		
-
-		System.out.println("Title Top 3");
-		
-		for(int i = 0; i < top.length; i++) {
-			Node n = titles.item(top[i]);
-			Element e = (Element)n;
-			String str = e.getTextContent();
-			System.out.println(str);
-		}
-		
-		scan.close();
+		return qid;
 	}
 	
 }
