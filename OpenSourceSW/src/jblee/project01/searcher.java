@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 public class searcher {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void Calcsim2(String filePath, String query) throws IOException, ClassNotFoundException, ParserConfigurationException, SAXException {
+	public void Calcsim(String filePath, String query) throws IOException, ClassNotFoundException, ParserConfigurationException, SAXException {
 
 		Scanner scan = new Scanner(System.in);
 		
